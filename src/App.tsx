@@ -1,32 +1,43 @@
 import React, { useState, useCallback } from 'react';
 import { Flame } from 'lucide-react';
 import { generateDeck } from './data/cards';
-import { Card } from './types';
+import { Card, GameMode, DrawnCard } from './types';
 import { Banner } from './components/Banner';
 import { DrawnCardsList } from './components/DrawnCardsList';
+import { ModeSwitch } from './components/ModeSwitch';
 
 function App() {
   const [deck, setDeck] = useState<Card[]>(() => generateDeck());
-  const [currentCard, setCurrentCard] = useState<Card | null>(null);
-  const [drawnCards, setDrawnCards] = useState<Card[]>([]);
+  const [currentCard, setCurrentCard] = useState<DrawnCard | null>(null);
+  const [drawnCards, setDrawnCards] = useState<DrawnCard[]>([]);
+  const [gameMode, setGameMode] = useState<GameMode>('sfw');
 
   const drawCard = useCallback(() => {
     if (deck.length === 0) return;
 
     const randomIndex = Math.floor(Math.random() * deck.length);
-    const drawnCard = deck[randomIndex];
+    const card = deck[randomIndex];
     const newDeck = deck.filter((_, index) => index !== randomIndex);
+    
+    const drawnCard: DrawnCard = {
+      ...card,
+      drawnMode: gameMode
+    };
 
     setDeck(newDeck);
     setCurrentCard(drawnCard);
     setDrawnCards(prev => [drawnCard, ...prev]);
-  }, [deck]);
+  }, [deck, gameMode]);
 
   const resetGame = useCallback(() => {
     setDeck(generateDeck());
     setCurrentCard(null);
     setDrawnCards([]);
   }, []);
+
+  const handleModeChange = (newMode: GameMode) => {
+    setGameMode(newMode);
+  };
 
   return (
     <div 
@@ -45,14 +56,16 @@ function App() {
 
                 {/* Current card display */}
                 {currentCard && (
-                  <div className="relative card-appear w-65 h-96">
+                  <div className="relative card-appear">
                     <img
                       src={currentCard.imageUrl}
                       alt={`${currentCard.value} of ${currentCard.suit}`}
-                      className="w-full h-full object-cover rounded-lg fiery-glow"
+                      className="w-[280px] sm:w-[320px] md:w-[360px] h-auto rounded-lg fiery-glow"
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-4 rounded-b-lg">
-                      <p className="font-bold text-lg">{currentCard.assignment}</p>
+                      <p className="font-bold text-sm sm:text-base md:text-lg">
+                        {currentCard.assignments[currentCard.drawnMode]}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -93,8 +106,9 @@ function App() {
               </div>
             </div>
 
-            {/* Banner and credits */}
-            <div className="w-full mt-auto">
+            {/* Mode Switch and Banner */}
+            <div className="w-full mt-12 space-y-6">
+              <ModeSwitch currentMode={gameMode} onModeChange={handleModeChange} />
               <Banner adContent="Support this game!" />
             </div>
           </div>
@@ -104,4 +118,4 @@ function App() {
   );
 }
 
-export default App;
+export default App

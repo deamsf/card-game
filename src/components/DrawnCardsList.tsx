@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card } from '../types';
+import { DrawnCard } from '../types';
 
 interface DrawnCardsListProps {
-  drawnCards: Card[];
+  drawnCards: DrawnCard[];
 }
 
 export const DrawnCardsList: React.FC<DrawnCardsListProps> = ({ drawnCards }) => {
@@ -22,11 +22,11 @@ export const DrawnCardsList: React.FC<DrawnCardsListProps> = ({ drawnCards }) =>
             />
             <div className="min-w-0 flex-1">
               <p className="font-semibold">{`${card.value} of ${card.suit}`}</p>
-              <p className="text-sm text-orange-300 break-words">{card.assignment}</p>
+              <p className="text-sm text-orange-300 break-words">{card.assignments[card.drawnMode]}</p>
             </div>
           </div>
         ))}
       </div>
     </div>
   );
-};
+}
